@@ -1,16 +1,21 @@
-FROM node
+# Use official Node image
+FROM node:18-alpine
 
-WORKDIR /app/backend
+# Set working directory
+WORKDIR /app
 
-COPY . /app/backend/
+# Copy package files
+COPY package*.json ./
 
+# Install dependencies
 RUN npm install
 
-ENV DB_user=value
-ENV DB_password=value
-ENV DB_name=value
-ENV SECRET_KEY=value
-ENV EMAIL=value
-ENV PASSWORD=value
+# Copy source code
+COPY . .
 
-CMD ["node", "server.js"]
+# Expose backend port
+EXPOSE 5000
+
+# Start server
+CMD ["npm", "start"]
+

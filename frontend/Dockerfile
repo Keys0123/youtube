@@ -1,11 +1,23 @@
-FROM node
+# Build stage
+FROM node:18-alpine AS build
 
-WORKDIR /app/frontend
+WORKDIR /app
 
-COPY . /app/frontend/
+COPY package*.json ./
+RUN npm install
 
-RUN npm install && npm run build
+COPY . .
 
-EXPOSE 4000
+# Vite reads env at build time
+ARG VITE_API_URL
+ENV VITE_API_URL=$VITE_API_URL
 
-CMD [ "npm", "run", "preview" ]
+RUN npm run build
+
+# Production stage
+FROM nginx:alpine
+COPY --from=build /app/dist /usr/share/nginx/html
+
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
+
